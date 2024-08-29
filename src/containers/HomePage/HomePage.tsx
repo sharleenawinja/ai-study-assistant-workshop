@@ -3,28 +3,19 @@ import { MessageBar } from '@/components/MessageBar'
 import { Search } from '@/components/Search'
 import { ChatLayout } from '@/layouts/ChatLayout/Chat.layout'
 import { useSearch } from '@/queries/useSearch'
-import { ApiChatMessage, chatApi } from '@/services/api'
+import { chatApi } from '@/services/api'
 import { populateDirs } from '@/utils/populateDirs.util'
 import { Button } from '@nextui-org/button'
 import React, { useEffect, useMemo, useState } from 'react'
+import { useChatSessions } from './hooks'
 
 export type HomePageProps = React.HTMLProps<HTMLDivElement>
-
-type ChatSession = {
-  id: string
-  title: string
-  messages: ApiChatMessage[][]
-  createdAt: Date
-}
 
 export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
   const [query, setQuery] = useState('')
   const [prompt, setPrompt] = useState('')
   const [selectedFiles, setSelectedFiles] = useState<string[]>([])
-  const [messages, setMessages] = useState<ApiChatMessage[]>([])
   const [generating, setGenerating] = useState(false)
-  const [chatSessions, setChatSessions] = useState<ChatSession[]>([])
-  const [currentChatSession, setCurrentChatSession] = useState<ChatSession>()
 
   const search = useSearch(
     { query },
@@ -67,66 +58,13 @@ export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
     setPrompt('')
   }
 
-  const createNewChatSession = () => {
-    const newChatSession: ChatSession = {
-      id: Math.random().toString(),
-      title: 'New Chat Session',
-      messages: [],
-      createdAt: new Date(),
-    }
-
-    setChatSessions((prevSessions) => [newChatSession, ...prevSessions])
-    setCurrentChatSession(newChatSession)
-    setMessages([])
-  }
-
-  useEffect(() => {
-    if (currentChatSession) {
-      const updatedChatSession = {
-        ...currentChatSession!,
-        messages: [messages],
-        title: messages.length > 0 ? messages[0].message : 'New Chat Session',
-      }
-
-      setCurrentChatSession(updatedChatSession)
-
-      const updatedChatSessions = chatSessions.map((session) =>
-        session.id === updatedChatSession.id ? updatedChatSession : session,
-      )
-
-      setChatSessions(updatedChatSessions)
-    }
-  }, [messages])
-
-  useEffect(() => {
-    const storedSessions = localStorage.getItem('chatSessions')
-
-    if (storedSessions) {
-      const parsedStoredSessions = JSON.parse(storedSessions)
-
-      const sortedSessions = parsedStoredSessions.sort(
-        (a: ChatSession, b: ChatSession) =>
-          b.createdAt > a.createdAt ? 1 : -1,
-      )
-
-      setChatSessions(sortedSessions)
-
-      const mostRecentSession = sortedSessions[0]
-      setCurrentChatSession(mostRecentSession)
-      setMessages(mostRecentSession.messages.flat())
-    }
-    if (!storedSessions) {
-      const newChatSession = {
-        id: Math.random().toString(),
-        title: 'New Chat',
-        messages: [],
-        createdAt: new Date(),
-      }
-
-      setChatSessions([newChatSession])
-      setCurrentChatSession(newChatSession)
-    }
-  }, [])
+  const {
+    chatSessions,
+    messages,
+    setCurrentChatSession,
+    setMessages,
+    createNewChatSession,
+  } = useChatSessions()
 
   useEffect(() => {
     if (chatSessions.length > 0) {
