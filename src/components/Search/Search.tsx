@@ -1,7 +1,9 @@
 import { AnimatedText } from '@/components/AnimatedText'
 import { SearchBar } from '@/components/SearchBar'
+import { FileData } from '@/types/data.types'
 import clsx from 'clsx'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { SearchFilters } from '../SearchFilters/SearchFilters'
 import { SearchResult, SearchResultProps } from '../SearchResult'
 
 export type SearchProps = {
@@ -28,6 +30,37 @@ export const Search: React.FC<SearchProps> = ({
   onSelect,
   compact,
 }) => {
+  const [filter, setFilter] = useState<string | undefined>()
+  const [displayedResults, setDisplayedResults] = useState<
+    FileData[] | undefined
+  >(results)
+
+  useEffect(() => {
+    if (results) {
+      setDisplayedResults(results)
+    }
+  }, [results])
+
+  const updateFilter = (newFilter: string) => {
+    if (newFilter !== filter) {
+      setFilter(newFilter)
+
+      if (results) {
+        const newResults = results.filter(
+          (singleResult) => singleResult.type === newFilter,
+        )
+        setDisplayedResults(newResults)
+      }
+    }
+  }
+
+  const clearFilters = () => {
+    if (filter !== undefined) {
+      setFilter(undefined)
+      setDisplayedResults(results)
+    }
+  }
+
   return (
     <div className="flex flex-col">
       <SearchBar
@@ -43,8 +76,9 @@ export const Search: React.FC<SearchProps> = ({
           onSearch && onSearch(query || '')
         }}
       />
+      <SearchFilters updateFilter={updateFilter} clearFilters={clearFilters} />
       <div>
-        {typeof results !== 'undefined' && (
+        {typeof displayedResults !== 'undefined' && (
           <SearchResult
             title={
               <div className="flex flex-row items-center gap-2">
@@ -66,7 +100,7 @@ export const Search: React.FC<SearchProps> = ({
             }
             selected={selectedFiles}
             onSelect={onSelect}
-            files={results}
+            files={displayedResults}
             hideList={compact}
             compactOverview={compact}
           />
