@@ -40,12 +40,12 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
 ## Enhance Search Functionality task - Implementing filters based on file type to refine search results. 
-- I modified the current icons for the file types, and passed an isFilterIcon prop, which then returns a different svg based on whether this is true or false. I did this so as to avoid creating different svg files for the different icons that were used in the filters.
-- I created a SearchFilters component, which renders the search filters as well as a Clear Filters button. 
-- I modified the Search component and added a filter state which keeps track of the set filter and renders results based on the filters. This component also has a clearFilters function, which clears the filters and displays all results regardless of file type.
+- I modified the current icons for the file types, and passed an `isFilterIcon` prop, which then returns a different svg based on whether this is true or false. I did this so as to avoid creating different svg files for the different icons that were used in the filters.
+- I created a `SearchFilters` component, which renders the search filters as well as a `Clear Filters` button. 
+- I modified the Search component and added a filter state which keeps track of the set filter and renders results based on the filters. This component also has a `clearFilters` function, which clears the filters and displays all results regardless of file type.
 
 ## Enhance Chat Functionality - using the browser's local storage API to store a list of chat sessions (with a design similar to ChatGPT's interface). 
 - I began by working on storing chat sessions in an object having  `id`, `title`, `messages` and `createdAt` fields.
 - I implemented getting the chat sessions from local storage and setting the messages as the messages of the `currentChatSession`.
-- -Thereafter, I worked on rendering for the `chatSessions` and their messages, and lastly, I extracted some code into a custom hook so as to keep the code clean. 
+- Thereafter, I worked on rendering for the `chatSessions` and their messages, and lastly, I extracted some code into a custom hook so as to keep the code clean. 
 
